@@ -1,5 +1,6 @@
 package com.example.vdi01.domain.questionanswer;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -7,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 기본 생성자 추가
 @Getter // GETTER 메소드 추가
@@ -35,9 +38,11 @@ public class Board {
     @Column
     private LocalDateTime updateDate;
 
-
-    //oneToMany로 불러야함
-
+    // 20220705 추가
+    @JsonIgnoreProperties({"board"}) // 무한참조 발생 금지
+    @OneToMany(mappedBy = "board", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE) // 게시글 하나당 댓글 여러개, mappedBy는 연관관계의 주인을 정함
+    private List<Comment> comments = new ArrayList<>();// 연관관계의 주인이 아니므로 DB의 FK가 아니다
+    // board 테이블에 댓글리스트를 추가함
     @Builder
     public Board(String title, String content, String writer, LocalDateTime createDate, Boolean deleted){
         this.title = title;

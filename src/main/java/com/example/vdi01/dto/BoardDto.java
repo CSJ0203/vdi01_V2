@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public class BoardDto {
 
     @Data
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class RequestDto{
         private Long id;
         private String title;
@@ -18,6 +17,7 @@ public class BoardDto {
         private LocalDateTime createDate = LocalDateTime.now();
         private LocalDateTime updateDate; // 수정일
 
+        //dto로 받은 Board 객체를 entity화해서 저장 Dto -> Entity
         public Board toEntity(){
             Board board = Board.builder()
                     .title(title)
@@ -27,8 +27,16 @@ public class BoardDto {
                     .createDate(createDate)
                     .build();
             return board;
-
         }
+
+        // 20220705 추가
+//        @Builder
+//        public RequestDto(Long id, String title, String content, LocalDateTime createDate){
+//            this.id = id;
+//            this.title = title;
+//            this.content = content;
+//            this.createDate = createDate;
+//        }
 
 //        public Request(Posts entity){
 //            this.id = entity.getId();
@@ -52,16 +60,40 @@ public class BoardDto {
         private LocalDateTime createDate;
         private LocalDateTime updateDate; // 수정일
 
-        public ResponseDto(Board entity){
-            this.id = entity.getId();
-            this.title = entity.getTitle();
-            this.content = entity.getContent();
-            this.writer = entity.getWriter();
-            this.deleted = false;
-            this.createDate = entity.getCreateDate();
-            this.updateDate = entity.getUpdateDate();
+        /*Entity -> Dto 상세, 리스트 두개로 쪼개기*/
 
+        //가장 기존의 것,,
+        public ResponseDto(Board board){
+            this.id = board.getId();
+            this.title = board.getTitle();
+            this.content = board.getContent();
+            this.writer = board.getWriter();
+            this.createDate = board.getCreateDate();
         }
+
+//        public ResponseDto(String title, String content, LocalDateTime createDate){
+//            this.title = title;
+//            this.content = content;
+//            this.createDate = createDate;
+//        }
+//
+//        public ResponseDto(Long id, String content, String title, String writer, LocalDateTime createDate){
+//            this.id = id;
+//            this.content = content;
+//            this.title = title;
+//            this.writer = writer;
+//            this.createDate = createDate;
+//        }
+
+        // 20220705 추가
+        @Builder
+        public ResponseDto(Long id, String title, String content, LocalDateTime createDate){
+            this.id = id;
+            this.title = title;
+            this.content = content;
+            this.createDate = createDate;
+        }
+
 
     }
 

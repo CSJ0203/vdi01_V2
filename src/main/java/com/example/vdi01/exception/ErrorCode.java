@@ -11,12 +11,13 @@ public enum ErrorCode {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다"),
 
     /*404 NOT_FOUND*/
-    NOT_FOUND(HttpStatus.NOT_FOUND, "게시글 정보를 찾을 수 없습니다."),
+    NOT_FOUND(HttpStatus.OK, "게시글 정보를 찾을 수 없습니다."),
 
     /*500 INTERNAL_SERVER_ERROR*/
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류입니다."),
     ;
 
+    // ERROR 코드 추가 ^^
     private final HttpStatus status;
     private final String message;
 }

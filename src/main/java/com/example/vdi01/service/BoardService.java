@@ -2,32 +2,33 @@ package com.example.vdi01.service;
 
 import com.example.vdi01.domain.questionanswer.Board;
 import com.example.vdi01.domain.questionanswer.BoardRepository;
+import com.example.vdi01.domain.questionanswer.Comment;
+import com.example.vdi01.domain.questionanswer.CommentRepository;
 import com.example.vdi01.dto.BoardDto;
+import com.example.vdi01.dto.commentDto;
 import com.example.vdi01.exception.CustomException;
 import com.example.vdi01.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.transaction.Transactional;
-import java.beans.Transient;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-@RequestMapping("/boards")
+// @RequestMapping("/boards")
 @RequiredArgsConstructor // final로 선언된 모든 멤버에 대한 생성자 만들어준댜
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
 
     /*게시글 생성*/
     @Transactional
     public Long save(final BoardDto.RequestDto dto){
 
-        Board entity = boardRepository.save(dto.toEntity());
-        return entity.getId();
+        Board board = boardRepository.save(dto.toEntity()); // 객체명 따라서
+        return board.getId();
     }
 
     /*게시글 리스트*/
@@ -35,32 +36,54 @@ public class BoardService {
     public List<BoardDto.ResponseDto> findAll(){
         // 화면에서 받아올땐 Ajax대신 fetch
         // Ajax보다 API를 간단하게 호출한다는데 진짜일까 ㅇㅅㅇ
-        List<Board> list = boardRepository.findAll();
+        List<Board> boards = boardRepository.findAll(); // 리스트 뽑아서 엔티티로 받은 걸 컨트롤러로 던지기 위해 dto로 변경해야함
 
         // java 8부터 생긴 Stream
-        return list.stream() //boardRepository 뒤져서 나온 결과 list의 Stream을
-                .map(BoardDto.ResponseDto::new) // map을 통해 BoardDto.ResponseDto로 변환해서, 참고로 map filter sorted 있음 노션 정리 ㄱ
-                .collect(Collectors.toList()); // List로 반환
+//        return list.stream() //boardRepository 뒤져서 나온 결과 list의 Stream을
+//                .map(BoardDto.ResponseDto::new) // map을 통해 BoardDto.ResponseDto로 변환해서, 참고로 map filter sorted 있음 노션 정리 ㄱ
+//                .collect(Collectors.toList()); // List로 반환
+
+//        List<BoardDto.ResponseDto> resultList = list.stream().map(list -> model)
+
+        List<BoardDto.ResponseDto> boardDtos = new ArrayList<>(); // dto타입의 리스트 맨들기
+
+        // 까였음
+        for (Board board: boards) {
+            BoardDto.ResponseDto dto = BoardDto.ResponseDto.builder()
+                    .id(board.getId())
+                    .title(board.getTitle())
+                    .content(board.getContent())
+                    .createDate(board.getCreateDate())
+                    .build();
+
+            boardDtos.add(dto);
+        }
+
+        // findAll의 리턴값은
+
+
+
+        return boardDtos;
     }
 
     /*게시글 상세*/
     @Transactional
     public BoardDto.ResponseDto findById(Long id){
 
-        Board entity = boardRepository.findById(id)
+        Board board = boardRepository.findById(id)
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND)); // 게시글 없음
 
-        return new BoardDto.ResponseDto(entity);
+        return new BoardDto.ResponseDto(board);
 
     }
 
     /*게시글 수정*/
     @Transactional
     public Long update(Long id, BoardDto.RequestDto dto){
-        Board entity = boardRepository.findById(id)
+        Board board = boardRepository.findById(id)
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND));
 
-        entity.updateBoard(dto.getTitle(), dto.getContent(), dto.getDeleted());
+        board.updateBoard(dto.getTitle(), dto.getContent(), dto.getDeleted());
         // UPDATE 쿼리 실행 로직 없음, but 해당 메서드가 실행 종료되면 update 쿼리 자동 실행
         // 영속성 컨텍스트 개념 이해하기
         // 영속성 컨텍스트? == Entity를 영구히 저장하는 환경 의미, App과 DB 사이에서 객체 보관하는 가상 영역
@@ -73,11 +96,45 @@ public class BoardService {
     /*게시글 삭제*/
     @Transactional
     public Long delete(final Long id){
-        Board entity = boardRepository.findById(id)
+        Board board = boardRepository.findById(id)
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND));
 
-        entity.deletedBoard();
+        board.deletedBoard();
         return id;
+    }
+
+    /*답글 등록 ver1*/
+/*    @Transactional
+    public void saveComment(Long boardId, Comment comment){
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(()->new CustomException(ErrorCode.NOT_FOUND));
+
+        comment.saveComment(board);
+        commentRepository.save(comment);
+    }*/
+
+    /*답글 등록 */
+    @Transactional
+    public Long saveComment(Long boardId, commentDto.Request dto){
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(()->new CustomException(ErrorCode.NOT_FOUND));
+
+        Comment comment = dto.toEntity(); // 받은 dto -> Entity로 변경
+        comment.save(board);
+        commentRepository.save(comment);
+
+        return dto.getId();
+    }
+
+    /*답글 수정*/
+    @Transactional
+    public Long updateComment(Long boardId, Long commentId, commentDto.Request dto){
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND));
+
+        comment.update(dto.getComment());
+
+        return dto.getId();
     }
 
 }

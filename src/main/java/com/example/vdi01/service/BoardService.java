@@ -5,13 +5,17 @@ import com.example.vdi01.domain.questionanswer.BoardRepository;
 import com.example.vdi01.domain.questionanswer.Comment;
 import com.example.vdi01.domain.questionanswer.CommentRepository;
 import com.example.vdi01.dto.BoardDto;
-import com.example.vdi01.dto.commentDto;
+import com.example.vdi01.dto.BoardResponseDto;
+import com.example.vdi01.dto.CommentDto;
 import com.example.vdi01.exception.CustomException;
 import com.example.vdi01.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +35,8 @@ public class BoardService {
         return board.getId();
     }
 
-    /*게시글 리스트*/
-    @Transactional
+    /*게시글 리스트 1*/
+/*    @Transactional
     public List<BoardDto.ResponseDto> findAll(){
         // 화면에서 받아올땐 Ajax대신 fetch
         // Ajax보다 API를 간단하게 호출한다는데 진짜일까 ㅇㅅㅇ
@@ -58,22 +62,67 @@ public class BoardService {
 
             boardDtos.add(dto);
         }
+        return boardDtos;
+    }*/
 
-        // findAll의 리턴값은
+    @Transactional
+    public List<BoardResponseDto> findAll(Pageable pageable){
 
+//        Sort sort = Sort.by(Sort.Direction.DESC, "id", "createDate"); // id, 생성날짜순
+
+
+        List<BoardResponseDto> boards = boardRepository.findAllByBoard(pageable);
+        List<BoardResponseDto> boardDtos = new ArrayList<>();
+
+
+//        List<Board> boards = boardRepository.findAll();
+//        List<BoardResponseDto> boardDtos = new ArrayList<>();
+//        for (Board board : boards) {
+//            BoardResponseDto dto = BoardResponseDto.builder()
+//                    .title(board.getTitle())
+//                    .createDate(board.getCreateDate())
+//                    .writer(board.getWriter())
+//                    .build();
+//            boardDtos.add(dto);
+//        }
+
+//        return boardDtos;
+
+        for (BoardResponseDto boardDto:boards) {
+            BoardResponseDto dto = BoardResponseDto.builder()
+                    .title(boardDto.getTitle())
+                    .writer(boardDto.getWriter())
+                    .createDate(boardDto.getCreateDate())
+                    .build();
+
+            boardDtos.add(dto);
+        }
 
 
         return boardDtos;
+//       return boardRepository.findAll().stream().map(BoardResponseDto::new).collect(Collectors.toList());
     }
 
+
     /*게시글 상세*/
-    @Transactional
+/*    @Transactional
     public BoardDto.ResponseDto findById(Long id){
 
         Board board = boardRepository.findById(id)
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND)); // 게시글 없음
 
         return new BoardDto.ResponseDto(board);
+
+    }*/
+
+
+    @Transactional
+    public BoardResponseDto findById(Long id){
+
+        Board board = boardRepository.findById(id)
+                .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND));
+
+        return new BoardResponseDto(board);
 
     }
 
@@ -115,7 +164,7 @@ public class BoardService {
 
     /*답글 등록 */
     @Transactional
-    public Long saveComment(Long boardId, commentDto.Request dto){
+    public Long saveComment(Long boardId, CommentDto.Request dto){
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(()->new CustomException(ErrorCode.NOT_FOUND));
 
@@ -128,7 +177,7 @@ public class BoardService {
 
     /*답글 수정*/
     @Transactional
-    public Long updateComment(Long boardId, Long commentId, commentDto.Request dto){
+    public Long updateComment(Long boardId, Long commentId, CommentDto.Request dto){
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND));
 

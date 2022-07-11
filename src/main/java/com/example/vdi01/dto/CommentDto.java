@@ -5,11 +5,10 @@ import com.example.vdi01.domain.questionanswer.Comment;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.bytebuddy.asm.Advice;
 
 import java.time.LocalDateTime;
 
-public class commentDto {
+public class CommentDto {
 
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)

@@ -1,5 +1,6 @@
 package com.example.vdi01.exception;
 
+import com.sun.net.httpserver.Headers;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.common.util.impl.Log;
 import org.slf4j.Logger;
@@ -23,6 +24,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus().value())
                 .body(new ErrorResponse(e.getErrorCode()));
+
+
+
     }
 
 /*    *//*CustomException에서 정의한 404 *//*

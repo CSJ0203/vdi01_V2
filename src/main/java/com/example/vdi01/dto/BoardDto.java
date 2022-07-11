@@ -4,6 +4,8 @@ import com.example.vdi01.domain.questionanswer.Board;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class BoardDto {
 
@@ -60,6 +62,8 @@ public class BoardDto {
         private LocalDateTime createDate;
         private LocalDateTime updateDate; // 수정일
 
+//        private List<CommentDto.Response> comments;
+
         /*Entity -> Dto 상세, 리스트 두개로 쪼개기*/
 
         //가장 기존의 것,,
@@ -69,6 +73,7 @@ public class BoardDto {
             this.content = board.getContent();
             this.writer = board.getWriter();
             this.createDate = board.getCreateDate();
+       //     this.comments = board.getComments().stream().map(CommentDto.Response::new).collect(Collectors.toList());
         }
 
 //        public ResponseDto(String title, String content, LocalDateTime createDate){

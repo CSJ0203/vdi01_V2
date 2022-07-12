@@ -2,6 +2,7 @@ package com.example.vdi01.dto;
 
 import com.example.vdi01.domain.questionanswer.Board;
 import com.example.vdi01.domain.questionanswer.Comment;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Data;
 
@@ -32,6 +33,7 @@ public class BoardResponseDto {
         this.createDate = board.getCreateDate();
         this.comments = board.getComments().stream().map(CommentDto.Response::new).collect(Collectors.toList());
     }
+    @QueryProjection // Q-Type을 만들기 위한 어노테이션
     @Builder
     public BoardResponseDto (String title, String writer, LocalDateTime createDate){
         this.title = title;

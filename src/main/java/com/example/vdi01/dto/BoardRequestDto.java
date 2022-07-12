@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -13,12 +15,13 @@ import java.time.LocalDateTime;
 public class BoardRequestDto {
 
     private Long id;
+    @NotBlank
     private String title;
+    @NotBlank
     private String content;
+    @NotBlank
     private String writer;
     private Boolean deleted;
-    private LocalDateTime createDate = LocalDateTime.now();
-    private LocalDateTime updateDate;
 
     // Dto -> Entity
     public Board toEntity() {
@@ -27,7 +30,6 @@ public class BoardRequestDto {
                 .content(content)
                 .writer(writer)
                 .deleted(deleted)
-                .createDate(createDate)
                 .build();
         return board;
     }
@@ -48,7 +50,20 @@ public class BoardRequestDto {
         private String writer;
         private String title;
         private Boolean deleted;
-        private LocalDateTime createDate = LocalDateTime.now();
+//        private LocalDateTime createDate = LocalDateTime.now();
+        private LocalDateTime updateDate; // 수정일
+    }
+
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class save {
+        private String content;
+        private String writer;
+        private String title;
+        private Boolean deleted;
+//        private LocalDateTime createDate = LocalDateTime.now();
         private LocalDateTime updateDate; // 수정일
     }
 }

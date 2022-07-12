@@ -14,8 +14,9 @@ public enum ExceptionEnum {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "500", "내부 서버 오류입니다."),
     ;
 
+    //todo code는 상수로 빼자
     private final HttpStatus status;
-    private final String code;
+    private final String code; // 여기서 상수로 받든 or enum으로 받든
     private String message;
 
     ExceptionEnum(HttpStatus status, String code) {

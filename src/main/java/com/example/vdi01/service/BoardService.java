@@ -4,9 +4,7 @@ import com.example.vdi01.domain.questionanswer.Board;
 import com.example.vdi01.domain.questionanswer.BoardRepository;
 import com.example.vdi01.domain.questionanswer.Comment;
 import com.example.vdi01.domain.questionanswer.CommentRepository;
-import com.example.vdi01.dto.BoardDto;
-import com.example.vdi01.dto.BoardResponseDto;
-import com.example.vdi01.dto.CommentDto;
+import com.example.vdi01.dto.*;
 import com.example.vdi01.exception.CustomException;
 import com.example.vdi01.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -28,12 +26,21 @@ public class BoardService {
     private final CommentRepository commentRepository;
 
     /*게시글 생성*/
-    @Transactional
+/*    @Transactional
     public Long save(final BoardDto.RequestDto dto){
 
         Board board = boardRepository.save(dto.toEntity()); // 객체명 따라서
         return board.getId();
+    }*/
+
+    /*게시글 생성2 dto 분리*/
+    @Transactional
+    public Long save(final BoardRequestDto dto){
+
+        Board board = boardRepository.save(dto.toEntity()); // 객체명 따라서
+        return board.getId();
     }
+
 
     /*게시글 리스트 1*/
 /*    @Transactional
@@ -65,28 +72,17 @@ public class BoardService {
         return boardDtos;
     }*/
 
+    /*게시글 조회 2*/
     @Transactional
+//    public List<BoardResponseDto> findAll(String keyword, Pageable pageable){
     public List<BoardResponseDto> findAll(Pageable pageable){
 
 //        Sort sort = Sort.by(Sort.Direction.DESC, "id", "createDate"); // id, 생성날짜순
 
-
+//        List<BoardResponseDto> boards = boardRepository.findAllByBoard(keyword, pageable);
         List<BoardResponseDto> boards = boardRepository.findAllByBoard(pageable);
         List<BoardResponseDto> boardDtos = new ArrayList<>();
 
-
-//        List<Board> boards = boardRepository.findAll();
-//        List<BoardResponseDto> boardDtos = new ArrayList<>();
-//        for (Board board : boards) {
-//            BoardResponseDto dto = BoardResponseDto.builder()
-//                    .title(board.getTitle())
-//                    .createDate(board.getCreateDate())
-//                    .writer(board.getWriter())
-//                    .build();
-//            boardDtos.add(dto);
-//        }
-
-//        return boardDtos;
 
         for (BoardResponseDto boardDto:boards) {
             BoardResponseDto dto = BoardResponseDto.builder()
@@ -101,6 +97,61 @@ public class BoardService {
 
         return boardDtos;
 //       return boardRepository.findAll().stream().map(BoardResponseDto::new).collect(Collectors.toList());
+    }
+
+
+/*    @Transactional
+    public List<BoardResponseDto> findAllKeyword(String keyword, String type, Pageable pageable){
+
+        List<BoardResponseDto> boards = new ArrayList<>();
+        List<BoardResponseDto> boardDtos = new ArrayList<>();
+
+        if(!keyword.isEmpty() && !type.isEmpty()){
+            if(type.equals("title")){
+                boards = boardRepository.findAllByBoardTitle(keyword, pageable);
+            }
+            else if(type.equals("writer")){
+                boards = boardRepository.findAllByBoardWriter(keyword, pageable);
+            }
+        }
+        *//*else if(keyword.isEmpty() && type.isEmpty()){
+            boards = boardRepository.findAllByBoard(pageable);
+        }*//*
+
+        for (BoardResponseDto boardDto:boards) {
+            BoardResponseDto dto = BoardResponseDto.builder()
+                    .title(boardDto.getTitle())
+                    .writer(boardDto.getWriter())
+                    .createDate(boardDto.getCreateDate())
+                    .build();
+
+            boardDtos.add(dto);
+        }
+
+
+        return boardDtos;
+    }*/
+
+
+    // findAllByBoardSearch
+    @Transactional
+    public List<Board> findAllSearch(BoardSearchDto boardSearchDto, Pageable pageable){
+        List<Board> boards = boardRepository.findAllByBoardSearch(boardSearchDto, pageable);
+        List<Board> boardDtos = new ArrayList<>();
+
+
+        for (Board boardDto:boards) {
+            Board dto = Board.builder()
+                    .title(boardDto.getTitle())
+                    .writer(boardDto.getWriter())
+                    .createDate(boardDto.getCreateDate())
+                    .build();
+
+            boardDtos.add(dto);
+        }
+
+
+        return boardDtos;
     }
 
 

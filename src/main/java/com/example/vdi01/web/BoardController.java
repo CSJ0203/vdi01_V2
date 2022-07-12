@@ -1,8 +1,7 @@
 package com.example.vdi01.web;
 
-import com.example.vdi01.dto.BoardDto;
-import com.example.vdi01.dto.BoardResponseDto;
-import com.example.vdi01.dto.CommentDto;
+import com.example.vdi01.domain.questionanswer.Board;
+import com.example.vdi01.dto.*;
 import com.example.vdi01.exception.ApiException;
 import com.example.vdi01.exception.CustomException;
 import com.example.vdi01.exception.ErrorCode;
@@ -16,6 +15,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
+
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -39,11 +40,18 @@ public class BoardController {
     }
 
     /*게시글 생성*/
-    @PostMapping
+/*    @PostMapping
     public Long save(@RequestBody final BoardDto.RequestDto dto){
         return boardService.save(dto);
-        // todo save-> "postBoard"
-        // todo @valid
+    }*/
+
+    /*게시글 생성 2, dto 분리*/
+    @PostMapping
+    public Long postBoard(@RequestBody @Valid final BoardRequestDto dto){
+        //ResponseBody로 들어오는 객체에 대한 검증 수행
+        return boardService.save(dto);
+        // todo save-> "postBoard" 완료
+        // todo @valid 완료
     }
 
     /*게시글 전체 조회 1*/
@@ -53,13 +61,48 @@ public class BoardController {
     }*/
 
     /*게시글 전체 조회 2, dto 분리본 사용*/
-    @GetMapping
-    public List<BoardResponseDto> findAll(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
+/*    @GetMapping("/keyword/{type}")
+    public List<BoardResponseDto> findAllKeyword(String keyword, @PathVariable final String type, @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
        // page = 현재펭지, size = 보여줄 게시물수, sort = 페이징 조건, direction =  정렬
+        // todo 검색 구현 : 타이틀 and 글쓴이
+        // todo finaAll -> findAllPage
+        return boardService.findAllKeyword(keyword, type, pageable);
+    }*/
+
+    /*게시글 전체 조회 3, dto 분리본 사용, paging 사용*/
+    @GetMapping("findAll")
+//    public List<BoardResponseDto> findAll(String keyword, @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
+    public List<BoardResponseDto> findAll(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
+        // page = 현재펭지, size = 보여줄 게시물수, sort = 페이징 조건, direction =  정렬
+        // todo 검색 구현 : 타이틀 and 글쓴이
+        // todo finaAll -> findAllPage
+//        return boardService.findAll(keyword, pageable);
+        return boardService.findAll(pageable);
+    }
+
+    @GetMapping
+    public List<BoardResponseDto> findAll2(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
+
+        // page = 현재펭지, size = 보여줄 게시물수, sort = 페이징 조건, direction =  정렬
         // todo 검색 구현 : 타이틀 and 글쓴이
         // todo finaAll -> findAllPage
         return boardService.findAll(pageable);
     }
+
+    /**
+     * 그거뭐여,,,,
+     * @param pageable
+     * @return
+     */
+    @GetMapping("queryDsl")
+    public List<Board> findAll3(BoardSearchDto boardSearchDto, @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
+
+        // page = 현재펭지, size = 보여줄 게시물수, sort = 페이징 조건, direction =  정렬
+        // todo 검색 구현 : 타이틀 and 글쓴이
+        // todo finaAll -> findAllPage
+        return boardService.findAllSearch(boardSearchDto, pageable);
+    }
+
 
     /*게시글 개별 조회*/
 /*    @GetMapping("/{id}")

@@ -16,14 +16,10 @@ public class CommentDto {
         private Long id;
         private String comment;
         private String writer;
-        private LocalDateTime createDate = LocalDateTime.now();
-        private Board board;
 
         public Comment toEntity(){
             Comment comment1 = Comment.builder()
                     .comment(comment)
-                    .board(board)
-                    .createDate(createDate)
                     .build();
 
             return comment1;

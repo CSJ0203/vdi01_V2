@@ -8,5 +8,14 @@ import java.util.List;
 
 public interface BoardRepositoryCustom {
 //    List<BoardResponseDto> findAllByBoardSearch(BoardSearchDto boardSearchDto);
-    List<Board> findAllByBoardSearch(BoardSearchDto boardSearchDto, Pageable pageable);
+    List<BoardResponseDto> findAllByBoardSearch(BoardSearchDto boardSearchDto, Pageable pageable);
+
+    List<BoardResponseDto> findAllByBoardSearchLike(BoardSearchDto boardSearchDto, Pageable pageable);
+    List<BoardResponseDto> findAllByBoardSearchEq(BoardSearchDto boardSearchDto, Pageable pageable);
+
+    //   List<BoardResponseDto> findAllByBoardLike(String type, BoardSearchDto boardSearchDto, Pageable pageable);
+    // List<BoardResponseDto> findAllByBoardEq(String type, BoardSearchDto boardSearchDto, Pageable pageable);
+
+
+
 }

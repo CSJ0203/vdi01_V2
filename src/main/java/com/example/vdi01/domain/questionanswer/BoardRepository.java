@@ -24,9 +24,6 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardReposi
     @Query("select new com.example.vdi01.dto.BoardResponseDto(b.title, b.writer, b.createDate) from Board b")
     List<BoardResponseDto> findAllByBoard(Pageable pageable);
 
-    // todo dto를 파라미터로 받음
-
-
 /*    @Query("select b.id, b.title, b.content, b.writer, b.createDate, b.updateDate from Board b where b.writer like %:keyword%")
     List<BoardResponseDto> findAllByBoardWriter(String keyword, Pageable pageable);
 
@@ -39,7 +36,11 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardReposi
 
      }*/
 
-    List<Board> findAllByBoardSearch(BoardSearchDto boardSearchDto, Pageable pageable);
+    List<BoardResponseDto> findAllByBoardSearch(BoardSearchDto boardSearchDto, Pageable pageable);
+    List<BoardResponseDto>findAllByBoardSearchLike(BoardSearchDto boardSearchDto, Pageable pageable);
+    List<BoardResponseDto>findAllByBoardSearchEq(BoardSearchDto boardSearchDto, Pageable pageable);
 
+//    List<BoardResponseDto> findAllByBoardSearchLike(String type, BoardSearchDto boardSearchDto, Pageable pageable);
+  //  List<BoardResponseDto> findAllByBoardSearchEq(String type, BoardSearchDto boardSearchDto, Pageable pageable);
 
 }

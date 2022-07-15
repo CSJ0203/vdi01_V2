@@ -18,11 +18,11 @@ public class BoardResponseDto {
     private String title;
     private String content;
     private String writer;
-    private LocalDateTime createDate = LocalDateTime.now();
+    private LocalDateTime createDate;
 
     private LocalDateTime updateDate;
 
-    private List<CommentDto.Response> comments;
+//    private List<CommentDto.Response> comments;
 
     // Entity -> Dto
     public BoardResponseDto (Board board){
@@ -31,9 +31,9 @@ public class BoardResponseDto {
         this.content = board.getContent();
         this.writer = board.getWriter();
         this.createDate = board.getCreateDate();
-        this.comments = board.getComments().stream().map(CommentDto.Response::new).collect(Collectors.toList());
+ //       this.comments = board.getComments().stream().map(CommentDto.Response::new).collect(Collectors.toList());
     }
-    @QueryProjection // Q-Type을 만들기 위한 어노테이션
+    @QueryProjection // Q-Type을 만들기 위한 어노테이션, 조회할 대상 지정
     @Builder
     public BoardResponseDto (String title, String writer, LocalDateTime createDate){
         this.title = title;

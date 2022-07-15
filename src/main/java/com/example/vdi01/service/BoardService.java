@@ -5,11 +5,9 @@ import com.example.vdi01.domain.questionanswer.BoardRepository;
 import com.example.vdi01.domain.questionanswer.Comment;
 import com.example.vdi01.domain.questionanswer.CommentRepository;
 import com.example.vdi01.dto.*;
-import com.example.vdi01.exception.CustomException;
-import com.example.vdi01.exception.ErrorCode;
+import com.example.vdi01.exception.ApiException;
+import com.example.vdi01.exception.ExceptionEnum;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -135,13 +133,14 @@ public class BoardService {
 
     // findAllByBoardSearch
     @Transactional
-    public List<Board> findAllSearch(BoardSearchDto boardSearchDto, Pageable pageable){
-        List<Board> boards = boardRepository.findAllByBoardSearch(boardSearchDto, pageable);
-        List<Board> boardDtos = new ArrayList<>();
+    public List<BoardResponseDto> findAllSearch(BoardSearchDto boardSearchDto, Pageable pageable){
+
+        List<BoardResponseDto> boards = boardRepository.findAllByBoardSearch(boardSearchDto, pageable);
+        List<BoardResponseDto> boardDtos = new ArrayList<>();
 
 
-        for (Board boardDto:boards) {
-            Board dto = Board.builder()
+        for (BoardResponseDto boardDto:boards) {
+            BoardResponseDto dto = BoardResponseDto.builder()
                     .title(boardDto.getTitle())
                     .writer(boardDto.getWriter())
                     .createDate(boardDto.getCreateDate())
@@ -153,6 +152,71 @@ public class BoardService {
 
         return boardDtos;
     }
+
+
+    @Transactional
+    public List<BoardResponseDto> findAllSearch2(String type, BoardSearchDto boardSearchDto, Pageable pageable){
+
+        List<BoardResponseDto> boards = new ArrayList<>();
+
+        if("like".equals(type)){
+            boards = boardRepository.findAllByBoardSearchLike(boardSearchDto, pageable);
+        } if("eq".equals(type)){
+            boards = boardRepository.findAllByBoardSearchEq(boardSearchDto,pageable);
+        }
+
+        List<BoardResponseDto> boardDtos = new ArrayList<>();
+
+
+        for (BoardResponseDto boardDto:boards) {
+            BoardResponseDto dto = BoardResponseDto.builder()
+                    .title(boardDto.getTitle())
+                    .writer(boardDto.getWriter())
+                    .createDate(boardDto.getCreateDate())
+                    .build();
+
+            boardDtos.add(dto);
+        }
+
+
+        return boardDtos;
+    }
+
+
+    @Transactional
+    public List<BoardResponseDto> findAllSearch3(BoardSearchDto boardSearchDto, Pageable pageable){
+
+        List<BoardResponseDto> boards = new ArrayList<>();
+
+/*        if("like".equals(type)){
+            boards = boardRepository.findAllByBoardSearchLike(boardSearchDto, pageable);
+        } if("eq".equals(type)){
+            boards = boardRepository.findAllByBoardSearchEq(boardSearchDto,pageable);
+        }*/
+
+        if("like".equals(boardSearchDto.getType())){
+            boards = boardRepository.findAllByBoardSearchLike(boardSearchDto, pageable);
+        }else if("eq".equals(boardSearchDto.getType())){
+            boards = boardRepository.findAllByBoardSearchEq(boardSearchDto,pageable);
+        }
+
+        List<BoardResponseDto> boardDtos = new ArrayList<>();
+
+
+        for (BoardResponseDto boardDto:boards) {
+            BoardResponseDto dto = BoardResponseDto.builder()
+                    .title(boardDto.getTitle())
+                    .writer(boardDto.getWriter())
+                    .createDate(boardDto.getCreateDate())
+                    .build();
+
+            boardDtos.add(dto);
+        }
+
+
+        return boardDtos;
+    }
+
 
 
     /*게시글 상세*/
@@ -171,7 +235,7 @@ public class BoardService {
     public BoardResponseDto findById(Long id){
 
         Board board = boardRepository.findById(id)
-                .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND));
+                .orElseThrow(()-> new ApiException(ExceptionEnum.NOT_FOUND));
 
         return new BoardResponseDto(board);
 
@@ -179,9 +243,9 @@ public class BoardService {
 
     /*게시글 수정*/
     @Transactional
-    public Long update(Long id, BoardDto.RequestDto dto){
+    public Long update(Long id, BoardRequestDto dto){
         Board board = boardRepository.findById(id)
-                .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND));
+                .orElseThrow(()-> new ApiException(ExceptionEnum.NOT_FOUND));
 
         board.updateBoard(dto.getTitle(), dto.getContent(), dto.getDeleted());
         // UPDATE 쿼리 실행 로직 없음, but 해당 메서드가 실행 종료되면 update 쿼리 자동 실행
@@ -197,7 +261,7 @@ public class BoardService {
     @Transactional
     public Long delete(final Long id){
         Board board = boardRepository.findById(id)
-                .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND));
+                .orElseThrow(()-> new ApiException(ExceptionEnum.NOT_FOUND));
 
         board.deletedBoard();
         return id;
@@ -217,12 +281,12 @@ public class BoardService {
     @Transactional
     public Long saveComment(Long boardId, CommentDto.Request dto){
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(()->new CustomException(ErrorCode.NOT_FOUND));
+                .orElseThrow(()->new ApiException(ExceptionEnum.NOT_FOUND));
 
         Comment comment = dto.toEntity(); // 받은 dto -> Entity로 변경
         comment.save(board);
         commentRepository.save(comment);
-
+            // todo 방어코드 넣기 valid, id 있나 없나
         return dto.getId();
     }
 
@@ -230,8 +294,9 @@ public class BoardService {
     @Transactional
     public Long updateComment(Long boardId, Long commentId, CommentDto.Request dto){
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND));
+                .orElseThrow(()-> new ApiException(ExceptionEnum.NOT_FOUND));
 
+        // todo 방어코드 넣기 valid, id 있나 없나
         comment.update(dto.getComment());
 
         return dto.getId();
